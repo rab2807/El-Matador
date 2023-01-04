@@ -7,9 +7,20 @@ public class Player : MonoBehaviour
 {
     private float speed = 10f;
     private string isCarrying = "none"; // the player carrying any pickup or not
+
     private float pickupTime = 0.5f; // just after picking up an object, player have to wait some time to place it down
-    private bool pickupFlag = true; // boolean flag to check the above task
+    private bool pickupFlag = true;
     private Timer pickupTimer;
+
+    private bool isPushed;
+    private Timer pushTimer;
+    private float pushDuration = 0.5f;
+
+    public bool IsPushed
+    {
+        get => isPushed;
+        set => isPushed = value;
+    }
 
     public string IsCarrying
     {
@@ -23,8 +34,12 @@ public class Player : MonoBehaviour
     {
         CircleCollider2D collider2D = GetComponent<CircleCollider2D>();
         collider2D.radius = GetComponent<SpriteRenderer>().bounds.size.x / 2; // set collider radius from sprite size
+
         pickupTimer = gameObject.AddComponent<Timer>();
         pickupTimer.TargetTime = pickupTime;
+
+        pushTimer = gameObject.AddComponent<Timer>();
+        pushTimer.TargetTime = pushDuration;
     }
 
     private bool frameFlag; // prevents multiple inputs taken in a single frame
@@ -53,20 +68,29 @@ public class Player : MonoBehaviour
             if (input3 > 0 && isCarrying != "none" && pickupFlag)
             {
                 print("placed it here!");
-                
+
                 GameObject obj = null;
                 if (isCarrying == "pillar")
                     obj = GameManager.GetPillar();
                 else if (isCarrying == "mirror")
                     obj = GameManager.GetMirror();
                 obj.transform.position = transform.position;
-                
+
                 toggleIsCarrying("none");
             }
         }
         else frameFlag = false;
-
         transform.position = position;
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (isPushed && col.gameObject.GetComponent<Pillar>() != null)
+        {
+            GetComponent<Rigidbody2D>().velocity *= 0.1f;
+            
+            // decrease life
+        }
     }
 
     // 
@@ -75,5 +99,14 @@ public class Player : MonoBehaviour
         isCarrying = objectName;
         pickupFlag = !pickupFlag;
         pickupTimer.ScheduleTask(() => { pickupFlag = !pickupFlag; });
+    }
+
+    public void pushPlayer()
+    {
+        if (!isPushed)
+        {
+            isPushed = true;
+            pushTimer.ScheduleTask(() => isPushed = false);
+        }
     }
 }

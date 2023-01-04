@@ -37,7 +37,6 @@ public class CarriableGenerator : MonoBehaviour
     void SpawnObject()
     {
         float x = Random.Range(0, 50);
-        print(x);
         GameObject obj;
         if (x < 25)
             obj = GameManager.GetPillar();
