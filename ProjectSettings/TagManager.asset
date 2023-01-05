@@ -6,6 +6,9 @@ TagManager:
   tags:
   - pillar
   - mirror
+  - gun
+  - bomb
+  - chainsaw
   layers:
   - Default
   - TransparentFX
@@ -19,7 +22,7 @@ TagManager:
   - MirrorCollision
   - Player
   - Villain
-  - 
+  - bullet
   - 
   - 
   - 

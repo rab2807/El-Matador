@@ -85,11 +85,15 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col)
     {
-        if (isPushed && col.gameObject.GetComponent<Pillar>() != null)
+        if (isPushed)
         {
-            GetComponent<Rigidbody2D>().velocity *= 0.1f;
-            
-            // decrease life
+            if (col.gameObject.GetComponent<Pillar>() != null || col.gameObject.GetComponent<Villain>() != null)
+            {
+                isPushed = false;
+                GetComponent<Rigidbody2D>().velocity *= 0.1f;
+
+                // decrease life for pillar only
+            }
         }
     }
 

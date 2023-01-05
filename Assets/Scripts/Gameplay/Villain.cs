@@ -7,7 +7,6 @@ public class Villain : MonoBehaviour
 {
     private float walkingSpeed = 1f;
     private float chargingSpeed = 5f;
-    private bool inWalkingPhase;
     private bool inChargingPhase;
     private float forceMagnitude = 35f;
 
@@ -18,7 +17,15 @@ public class Villain : MonoBehaviour
     private Vector3 direction;
     private GameObject player;
 
-    public bool InWalkingPhase => inWalkingPhase;
+    private bool gunActivated;
+    private bool bombActivated;
+    private bool chainsawActivated;
+    private Timer gunTimer;
+    private Timer bombTimer;
+    private Timer chainsawTimer;
+    private float gunDuration;
+    private float bombDuration;
+    private float chainsawDuration;
 
     public bool InChargingPhase
     {
@@ -31,9 +38,16 @@ public class Villain : MonoBehaviour
         pauseTimer = gameObject.AddComponent<Timer>();
         pauseTimer.TargetTime = pauseTime;
 
+        gunTimer = gameObject.AddComponent<Timer>();
+        gunTimer.TargetTime = gunDuration;
+        bombTimer = gameObject.AddComponent<Timer>();
+        bombTimer.TargetTime = bombDuration;
+        chainsawTimer = gameObject.AddComponent<Timer>();
+        chainsawTimer.TargetTime = chainsawDuration;
+
         player = GameObject.FindGameObjectWithTag("Player");
-        CircleCollider2D collider = GetComponent<CircleCollider2D>();
-        collider.radius = GetComponent<SpriteRenderer>().bounds.size.x / 2; // set collider radius from sprite size
+        GetComponent<CircleCollider2D>().radius =
+            GetComponent<SpriteRenderer>().bounds.size.x / 2; // set collider radius from sprite size
     }
 
     void Update()
@@ -67,11 +81,6 @@ public class Villain : MonoBehaviour
             }
             else // player in pushed state, can attack the villain
             {
-                // player stops after the attack
-                p.IsPushed = false;
-                Rigidbody2D rb2d = col.gameObject.GetComponent<Rigidbody2D>();
-                rb2d.velocity *= 0.1f;
-
                 // player smack cooldown
                 isPaused = true;
                 pauseTimer.ScheduleTask(() => isPaused = false);
@@ -94,5 +103,14 @@ public class Villain : MonoBehaviour
                 // decrease life
             }
         }
+    }
+
+
+    void ThrowBomb()
+    {
+    }
+
+    void ThrowChainsaw()
+    {
     }
 }
