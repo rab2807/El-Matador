@@ -18,4 +18,6 @@ public class HealthBar : MonoBehaviour
         slider.value = health;
         fill.color = gradient.Evaluate(slider.normalizedValue);
     }
+    // for any problem
+    // https://www.youtube.com/watch?v=BLfNP4Sc_iA&t=573s 
 }
