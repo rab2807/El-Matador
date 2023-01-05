@@ -7,14 +7,17 @@ public class Pillar : CarriableCollision
     protected override void CollisionActivity(Collision2D other)
     {
         Villain villain = other.gameObject.GetComponent<Villain>();
+        Player player = other.gameObject.GetComponent<Player>();
+
         if (villain != null)
         {
-            if(villain.InWalkingPhase)
+            GameManager.ReturnPillar(gameObject);
+        }
+
+        if (player != null)
+        {
+            if (player.IsPushed)
                 GameManager.ReturnPillar(gameObject);
-            if (villain.InChargingPhase)
-            {
-                // pillar e bari kheye health kombe
-            }
         }
     }
 }

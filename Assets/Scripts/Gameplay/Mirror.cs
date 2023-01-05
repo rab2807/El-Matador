@@ -13,7 +13,8 @@ public class Mirror : CarriableCollision
             GameManager.ReturnMirror(gameObject);
         if (player != null)
         {
-            // 
+            if (player.IsPushed)
+                GameManager.ReturnMirror(gameObject);
         }
     }
 }
