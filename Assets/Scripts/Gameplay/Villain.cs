@@ -52,7 +52,7 @@ public class Villain : MonoBehaviour
 
     void Update()
     {
-        if (!isPaused)
+        if (!isPaused && player)
         {
             direction = player.transform.position - transform.position;
             direction = direction.normalized;
