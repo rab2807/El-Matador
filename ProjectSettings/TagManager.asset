@@ -9,6 +9,7 @@ TagManager:
   - gun
   - bomb
   - chainsaw
+  - villain
   layers:
   - Default
   - TransparentFX

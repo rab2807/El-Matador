@@ -30,7 +30,6 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col)
     {
-        print(col.gameObject);
         if (col.gameObject.GetComponent<Mirror>() == null)
         {
             if (col.gameObject.GetComponent<Player>() != null)

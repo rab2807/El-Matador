@@ -7,13 +7,17 @@ public class PowerupToken : MonoBehaviour
 {
     private SpriteRenderer s;
     private float fadeSpeed = 0.002f;
+    private Villain villain;
 
     void Start()
     {
         s = GetComponent<SpriteRenderer>();
         CircleCollider2D col = GetComponent<CircleCollider2D>();
         col.radius = GetComponent<SpriteRenderer>().bounds.size.x / 2; // set collider radius from sprite size
+        villain = GameObject.FindGameObjectWithTag("villain").GetComponent<Villain>();
     }
+
+    private float angle;
 
     private void Update()
     {
@@ -22,9 +26,13 @@ public class PowerupToken : MonoBehaviour
         x -= fadeSpeed;
         s.color = new Color(c.r, c.g, c.b, x);
 
+        Vector3 position = transform.position;
+        position.y += Mathf.Sin(angle) * 0.008f;
+        transform.position = position;
+        angle += (Time.deltaTime * 10) % 360.0f;
+
         if (x < 0.01)
             GameManager.ReturnPowerUp(gameObject);
-        transform.Rotate(Vector3.back, 5f);
     }
 
     private void OnTriggerEnter2D(Collider2D col)
@@ -32,8 +40,7 @@ public class PowerupToken : MonoBehaviour
         Player p = col.gameObject.GetComponent<Player>();
         if (p != null)
         {
-            // activate powerup
-
+            villain.ActivatePowerUp(gameObject.tag);
             GameManager.ReturnPowerUp(gameObject);
         }
     }

@@ -1,28 +1,48 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Chainsaw : MonoBehaviour
 {
     private Timer timer;
-    private float interval = 1f;
+    private float interval = 3f;
     private bool isOn;
     private int count = 3;
 
-    void Start()
+    void Awake()
     {
         timer = gameObject.AddComponent<Timer>();
         timer.TargetTime = interval;
-
-        isOn = true;
-        timer.ScheduleTask(()=>Toggle());
+        
+        GetComponent<CircleCollider2D>().radius =
+            GetComponent<SpriteRenderer>().bounds.size.x / 2; // set collider radius from sprite size
     }
 
-    void Toggle()
+    public void Initiate()
+    {
+        isOn = false;
+        timer.ScheduleTask(() => Toggle());
+    }
+    
+    private float angle;
+
+    private void Update()
+    {
+        if (isOn)
+        {
+            transform.Rotate(Vector3.back, 6.0f);
+
+            Vector3 position = transform.position;
+            position.y += Mathf.Sin(angle) * 0.005f;
+            transform.position = position;
+        }
+
+        angle += (Time.deltaTime * 20) % 360.0f;
+    }
+
+    private void Toggle()
     {
         isOn = !isOn;
-        timer.ScheduleTask(()=>Toggle());
+        GetComponent<SpriteRenderer>().color = isOn ? new Color(230, 100, 100) : Color.white;
+        timer.ScheduleTask(() => Toggle());
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -33,14 +53,14 @@ public class Chainsaw : MonoBehaviour
             {
                 // decrease life
                 count--;
-                if(count==0)
+                if (count == 0)
                     GameManager.ReturnChainsaw(gameObject);
             }
             else if (other.gameObject.GetComponent<Villain>() != null)
             {
                 // decrease life
                 count--;
-                if(count==0)
+                if (count == 0)
                     GameManager.ReturnChainsaw(gameObject);
             }
         }

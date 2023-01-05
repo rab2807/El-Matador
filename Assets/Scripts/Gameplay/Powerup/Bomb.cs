@@ -6,6 +6,7 @@ using UnityEngine.Serialization;
 
 public class Bomb : MonoBehaviour
 {
+    private float explodeRadius = 3;
     private GameObject villain;
     private GameObject target;
 
@@ -21,13 +22,12 @@ public class Bomb : MonoBehaviour
     private float dist;
     private float baseY;
     private float height;
-    
+
     public void Initiate(GameObject villain, GameObject target)
     {
         this.villain = villain;
         targetPosition = target.transform.position;
         transform.position = villain.transform.position;
-        
     }
 
     void Update()
@@ -51,7 +51,7 @@ public class Bomb : MonoBehaviour
         }
     }
 
-     static Quaternion LookAtTarget(Vector2 r)
+    static Quaternion LookAtTarget(Vector2 r)
     {
         return Quaternion.Euler(0, 0, Mathf.Atan2(r.y, r.x) * Mathf.Rad2Deg);
     }
@@ -59,6 +59,27 @@ public class Bomb : MonoBehaviour
     void Explode()
     {
         // damage player and villain
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explodeRadius);
+        foreach (var col in colliders)
+        {
+            if (col.GetComponent<Player>())
+            {
+                // decrease life
+            }
+            else if (col.GetComponent<Villain>())
+            {
+                // decrease life
+            }
+            else if (col.GetComponent<Mirror>())
+            {
+                GameManager.ReturnMirror(col.gameObject);
+            }
+            else if (col.GetComponent<Pillar>())
+            {
+                GameManager.ReturnPillar(col.gameObject);
+            }
+        }
+
         print("exploded");
     }
 }

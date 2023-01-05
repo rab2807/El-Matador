@@ -80,6 +80,7 @@ public class Player : MonoBehaviour
             }
         }
         else frameFlag = false;
+
         transform.position = position;
     }
 
@@ -89,7 +90,6 @@ public class Player : MonoBehaviour
         {
             if (col.gameObject.GetComponent<Pillar>() != null || col.gameObject.GetComponent<Villain>() != null)
             {
-                isPushed = false;
                 GetComponent<Rigidbody2D>().velocity *= 0.1f;
 
                 // decrease life for pillar only
@@ -110,7 +110,10 @@ public class Player : MonoBehaviour
         if (!isPushed)
         {
             isPushed = true;
-            pushTimer.ScheduleTask(() => isPushed = false);
+            pushTimer.ScheduleTask(() =>
+            {
+                isPushed = false;
+            });
         }
     }
 }

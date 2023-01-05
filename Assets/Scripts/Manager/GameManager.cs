@@ -4,12 +4,20 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    private static ObjectPool pillarPool, mirrorPool, powerupPool, bulletPool, bombPool, chainsawPool;
+    private static ObjectPool pillarPool,
+        mirrorPool,
+        powerupGunPool,
+        powerupBombPool,
+        powerupChainsawPool,
+        bulletPool,
+        bombPool,
+        chainsawPool;
+
     private int pillarPoolCapacity = 5;
     private int mirrorPoolCapacity = 5;
     private int powerupPoolCapacity = 4;
-    private int bulletPoolCapacity = 25;
-    private int bombPoolCapacity = 4;
+    private int bulletPoolCapacity = 20;
+    private int bombPoolCapacity = 6;
     private int chainsawPoolCapacity = 4;
 
     private void Awake()
@@ -19,27 +27,28 @@ public class GameManager : MonoBehaviour
 
         pillarPool = gameObject.AddComponent<ObjectPool>();
         pillarPool.Initialize(pillarPoolCapacity, "pillar");
-
         mirrorPool = gameObject.AddComponent<ObjectPool>();
         mirrorPool.Initialize(mirrorPoolCapacity, "mirror");
-
-        powerupPool = gameObject.AddComponent<ObjectPool>();
-        powerupPool.Initialize(powerupPoolCapacity, "powerup");
-
+        powerupGunPool = gameObject.AddComponent<ObjectPool>();
+        powerupGunPool.Initialize(powerupPoolCapacity, "powerupGun");
+        powerupBombPool = gameObject.AddComponent<ObjectPool>();
+        powerupBombPool.Initialize(powerupPoolCapacity, "powerupBomb");
+        powerupChainsawPool = gameObject.AddComponent<ObjectPool>();
+        powerupChainsawPool.Initialize(powerupPoolCapacity, "powerupChainsaw");
         bulletPool = gameObject.AddComponent<ObjectPool>();
         bulletPool.Initialize(bulletPoolCapacity, "bullet");
-
         bombPool = gameObject.AddComponent<ObjectPool>();
         bombPool.Initialize(bombPoolCapacity, "bomb");
-        
-        // chainsawPool = gameObject.AddComponent<ObjectPool>();
-        // chainsawPool.Initialize(chainsawPoolCapacity, "chainsaw");
+        chainsawPool = gameObject.AddComponent<ObjectPool>();
+        chainsawPool.Initialize(chainsawPoolCapacity, "chainsaw");
 
         // gameObject.AddComponent<ParticleRenderer>();
 
         // GameObject ship = Resources.Load<GameObject>("Ship");
         // Instantiate(ship, Vector3.zero, Quaternion.identity);
     }
+
+    #region Object Getter & Setter
 
     public static GameObject GetPillar()
     {
@@ -63,27 +72,35 @@ public class GameManager : MonoBehaviour
 
     public static GameObject GetPowerUp()
     {
-        GameObject obj = powerupPool.GetObject();
+        GameObject obj = null;
         int x = Random.Range(0, 3);
         if (x == 0)
+        {
+            obj = powerupGunPool.GetObject();
             obj.tag = "gun";
+        }
         else if (x == 1)
         {
+            obj = powerupBombPool.GetObject();
             obj.tag = "bomb";
-            obj.GetComponent<SpriteRenderer>().color = Color.red;
         }
         else
         {
+            obj = powerupChainsawPool.GetObject();
             obj.tag = "chainsaw";
-            obj.GetComponent<SpriteRenderer>().color = Color.cyan;
         }
 
         return obj;
     }
 
-    public static void ReturnPowerUp(GameObject powerUp)
+    public static void ReturnPowerUp(GameObject obj)
     {
-        powerupPool.ReturnObject(powerUp);
+        if (obj.CompareTag("gun"))
+            powerupGunPool.ReturnObject(obj);
+        else if (obj.CompareTag("bomb"))
+            powerupBombPool.ReturnObject(obj);
+        else if (obj.CompareTag("chainsaw"))
+            powerupChainsawPool.ReturnObject(obj);
     }
 
     public static GameObject GetBullet()
@@ -115,6 +132,9 @@ public class GameManager : MonoBehaviour
     {
         chainsawPool.ReturnObject(obj);
     }
+
+
+    #endregion
 
     // public void Pause()
     // {

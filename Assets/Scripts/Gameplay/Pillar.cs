@@ -10,14 +10,15 @@ public class Pillar : CarriableCollision
         Player player = other.gameObject.GetComponent<Player>();
 
         if (villain != null)
-        {
             GameManager.ReturnPillar(gameObject);
-        }
-
-        if (player != null)
+        else if (player != null)
         {
             if (player.IsPushed)
+            {
+                player.IsPushed = false;
+                player.GetComponent<Rigidbody2D>().velocity *= 0.1f;
                 GameManager.ReturnPillar(gameObject);
+            }
         }
     }
 }
