@@ -17,14 +17,17 @@ public class CarriableTrigger : MonoBehaviour
         if (input3 != 0 && p != null && p.PickupFlag)
         {
             print("picked up!");
+            
+            AudioManager.Play("crush");
             string objectName = gameObject.tag;
-            transform.parent.gameObject.SetActive(false);
-            p.toggleIsCarrying(objectName);
-        }
-    }
 
-    void Update()
-    {
-        
+            SpriteRenderer spriteRenderer = transform.parent.gameObject.GetComponent<SpriteRenderer>();
+            var color = spriteRenderer.color;
+            color = new Color(color.r, color.g, color.b, 1);
+            spriteRenderer.color = color;
+
+            transform.parent.gameObject.SetActive(false);
+            p.ToggleIsCarrying(objectName);
+        }
     }
 }

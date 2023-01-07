@@ -133,17 +133,11 @@ public class GameManager : MonoBehaviour
         chainsawPool.ReturnObject(obj);
     }
 
-
     #endregion
 
-    // public void Pause()
-    // {
-    //     MenuManager.GoTo(MenuName.Pause);
-    // }
-    //
-    // private void Update()
-    // {
-    //     if (Input.GetKey(KeyCode.Escape))
-    //         MenuManager.GoTo(MenuName.Pause);
-    // }
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.Escape) && Time.timeScale != 0)
+            MenuManager.GoTo("pause");
+    }
 }

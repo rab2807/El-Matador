@@ -22,16 +22,24 @@ public class ChainsawThrower : MonoBehaviour
         else
         {
             isActive = true;
-            timer.ScheduleTask(Random.Range(3.0f, 5.0f), () => PlaceChainsaw());
+            timer.ScheduleTask(5, PlaceChainsaw);
         }
     }
 
     private void PlaceChainsaw()
     {
-        count--;
+        // take radius
         GameObject chainsaw = GameManager.GetChainsaw();
-        chainsaw.GetComponent<Chainsaw>().Initiate();
-        chainsaw.transform.position = transform.position;
+        float r = chainsaw.GetComponent<CircleCollider2D>().radius;
+        GameManager.ReturnChainsaw(chainsaw);
+
+        if (Physics2D.OverlapCircle(transform.position, r * 1.5f))
+        {
+            count--;
+            chainsaw = GameManager.GetChainsaw();
+            chainsaw.GetComponent<Chainsaw>().Initiate();
+            chainsaw.transform.position = transform.position;
+        }
 
         if (count == 0)
         {

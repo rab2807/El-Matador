@@ -6,7 +6,7 @@ public class BulletThrower : MonoBehaviour
 {
     private Timer timer;
     private float interval = 2f;
-    private int bulletRound = 10;
+    private int bulletRound = 5;
     private bool isActive;
 
     void Start()
@@ -28,6 +28,8 @@ public class BulletThrower : MonoBehaviour
 
     private void ShootBullets()
     {
+        AudioManager.Play("shoot");
+        
         bulletRound--;
         int count = 10;
         float angleGap = 360.0f / count;

@@ -5,8 +5,8 @@ using UnityEngine;
 public class CarriableGenerator : MonoBehaviour
 {
     private Timer timer;
-    private int maxObjectNum = 6;
-    private float minSpawnTime = 2;
+    private int maxObjectNum = 4;
+    private float minSpawnTime = 3;
     private float maxSpawnTime = 6;
 
     private int currentPillarNum;
@@ -42,10 +42,14 @@ public class CarriableGenerator : MonoBehaviour
             obj = GameManager.GetPillar();
         else
             obj = GameManager.GetMirror();
-        
-        Vector3 position = obj.transform.position;
-        position.x = Random.Range(ScreenData.Left + radius * 4, ScreenData.Right - radius * 4);
-        position.y = Random.Range(ScreenData.Top - radius * 4, ScreenData.Bottom + radius * 4);
-        obj.transform.position = position;
+
+        Vector3 position;
+        do
+        {
+            position = obj.transform.position;
+            position.x = Random.Range(ScreenData.Left + radius * 4, ScreenData.Right - radius * 4);
+            position.y = Random.Range(ScreenData.Top - radius * 4, ScreenData.Bottom + radius * 4);
+            obj.transform.position = position;
+        } while (Physics2D.OverlapCircle(position, obj.GetComponent<CircleCollider2D>().radius * 1.5f));
     }
 }

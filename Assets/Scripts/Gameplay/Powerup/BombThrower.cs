@@ -4,34 +4,44 @@ using UnityEngine;
 
 public class BombThrower : MonoBehaviour
 {
-    private Timer timer;
-    private float interval = 1f;
-    private int bombRound = 10;
+    private Timer trackingTimer;
+    private float trackingTime = 2f;
+    private bool trackingActive;
+    private Vector2 trackerFixedPosition;
+
+    private int bombRound = 3;
+
     private GameObject player;
+    private GameObject tracker;
     private bool isActive;
 
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        timer = gameObject.AddComponent<Timer>();
-        timer.TargetTime = interval;
+        tracker = GameObject.FindGameObjectWithTag("tracker");
+        tracker.SetActive(false);
+
+        trackingTimer = gameObject.AddComponent<Timer>();
+        trackingTimer.TargetTime = trackingTime;
     }
 
     public void Initiate()
     {
         if (isActive)
-            bombRound = 10;
+            bombRound = 3;
         else
         {
             isActive = true;
-            timer.ScheduleTask(() => ThrowBomb());
+            trackingTimer.ScheduleTask(StartTracking);
         }
     }
 
     private void ThrowBomb()
     {
+        AudioManager.Play("shoot");
+
         GameObject bomb = GameManager.GetBomb();
-        bomb.GetComponent<Bomb>().Initiate(gameObject, player);
+        bomb.GetComponent<Bomb>().Initiate(player.transform.position);
 
         if (bombRound == 0)
         {
@@ -40,10 +50,23 @@ public class BombThrower : MonoBehaviour
             return;
         }
 
-        timer.ScheduleTask(() => ThrowBomb());
+        trackingTimer.ScheduleTask(trackingTime * 2, StartTracking);
+    }
+
+    void StartTracking()
+    {
+        tracker.SetActive(true);
+        trackingActive = true;
+        trackingTimer.ScheduleTask(() =>
+        {
+            trackingActive = false;
+            ThrowBomb();
+        });
     }
 
     void Update()
     {
+        if (trackingActive)
+            tracker.transform.position = player.transform.position;
     }
 }

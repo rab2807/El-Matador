@@ -13,9 +13,11 @@ public class VillainTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        
         Player player = other.gameObject.GetComponent<Player>();
         if (player != null)
         {
+            AudioManager.Play("moo");
             villain.InChargingPhase = true;
         }
     }

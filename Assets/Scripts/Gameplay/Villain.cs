@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Manager;
 using UnityEngine;
 
 public class Villain : MonoBehaviour
 {
     private float walkingSpeed = 1.5f;
-    private float chargingSpeed = 5f;
+    private float chargingSpeed = 3.2f;
     private bool inChargingPhase;
-    private float forceMagnitude = 200;
+    private float forceMagnitude = 40;
 
     private bool isPaused;
     private Timer pauseTimer;
-    private float pauseTime = 0.8f;
+    private float pauseTime = 1.0f;
 
     private Vector3 direction;
     private GameObject player;
@@ -22,6 +23,8 @@ public class Villain : MonoBehaviour
     private bool chainsawActivated;
     private Timer powerupTimer;
     private float powerupTime;
+
+    private VillainAnimation animation;
 
     public bool InChargingPhase
     {
@@ -44,6 +47,8 @@ public class Villain : MonoBehaviour
         transform.GetChild(1).gameObject.SetActive(false);
         transform.GetChild(2).gameObject.SetActive(false);
         transform.GetChild(3).gameObject.SetActive(false);
+
+        animation = GetComponent<VillainAnimation>();
     }
 
     void Update()
@@ -53,6 +58,44 @@ public class Villain : MonoBehaviour
             direction = player.transform.position - transform.position;
             direction = direction.normalized;
             float speed = InChargingPhase ? chargingSpeed : walkingSpeed;
+
+            // animation state
+            if (!inChargingPhase && !HasPowerUp())
+            {
+                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                {
+                    animation.ChangeState(direction.x > 0 ? "right" : "left");
+                }
+                else
+                {
+                    animation.ChangeState(direction.y > 0 ? "rear" : "front");
+                }
+            }
+            else if (inChargingPhase && !HasPowerUp())
+            {
+                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                {
+                    animation.ChangeState(direction.x > 0 ? "rightAngry" : "leftAngry");
+                }
+                else
+                {
+                    animation.ChangeState(direction.y > 0 ? "rearAngry" : "frontAngry");
+                }
+            }
+            else if (HasPowerUp())
+            {
+                if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                {
+                    animation.ChangeState(direction.x > 0 ? "rightBomb" : "leftBomb");
+                }
+                else
+                {
+                    animation.ChangeState(direction.y > 0 ? "rearBomb" : "frontBomb");
+                }
+            }
+
+            if (isPaused)
+                animation.ChangeState("leftCollision");
 
             Vector3 position = transform.position;
             position.x += direction.x * speed * Time.deltaTime;
@@ -70,38 +113,72 @@ public class Villain : MonoBehaviour
 
             if (!p.IsPushed) // player in normal state and can be pushed
             {
-                p.pushPlayer();
+                print("player in normal state. Bull pushed");
+
+                p.PushPlayer();
                 rb2d.velocity = Vector3.zero;
                 Vector3 force = direction * forceMagnitude;
                 rb2d.AddForce(force, ForceMode2D.Impulse);
-                
-                isPaused = true;
-                pauseTimer.ScheduleTask(() => isPaused = false);
+
+                PauseVillain(false);
             }
             else // player in pushed state, can attack the villain
             {
-                // player smack cooldown
-                isPaused = true;
-                pauseTimer.ScheduleTask(() => isPaused = false);
+                print("player in pushed state. Bull damaged by player");
+                AudioManager.Play("dizzy");
 
-                // decrease life
+                PauseVillain(true);
+                ScoreManager.DecreaseLifeVillain("mirror");
             }
         }
-        else if (col.gameObject.GetComponent<Pillar>() != null)
+        else
         {
-            if (inChargingPhase)
+            if (col.gameObject.GetComponent<Pillar>() != null)
             {
-                // pillar smack cooldown
-                isPaused = true;
+                if (inChargingPhase)
+                {
+                    print("bull in charging state. Bull damaged by pillar");
+                    AudioManager.Play("dizzy");
+
+                    PauseVillain(true);
+                    ScoreManager.DecreaseLifeVillain("pillar");
+                }
+            }
+            else if (col.gameObject.GetComponent<Bullet>() != null)
+            {
+                print("Bull damaged by bullet");
+                AudioManager.Play("dizzy");
+
+                PauseVillain(true);
+                ScoreManager.DecreaseLifeVillain("bullet");
+            }
+            else if (col.gameObject.GetComponent<Bomb>() != null)
+            {
+                print("Bull damaged by bullet");
+                AudioManager.Play("dizzy");
+
+                PauseVillain(true);
+                ScoreManager.DecreaseLifeVillain("bomb");
+            }
+            else if (col.gameObject.GetComponent<Chainsaw>() != null)
+            {
+                print("Bull damaged by bullet");
+                AudioManager.Play("dizzy");
+
+                if (col.gameObject.GetComponent<Chainsaw>())
+                    isPaused = true;
                 pauseTimer.ScheduleTask(() => isPaused = false);
 
                 // decrease life
+                ScoreManager.DecreaseLifeVillain("bullet");
             }
         }
     }
 
     public void ActivatePowerUp(string name)
     {
+        AudioManager.Play("powerup");
+
         if (name == "gun")
         {
             GameObject obj = transform.GetChild(1).gameObject;
@@ -122,11 +199,18 @@ public class Villain : MonoBehaviour
         }
     }
 
-    void ThrowBomb()
+    public void PauseVillain(bool damage)
     {
+        isPaused = true;
+        if (damage)
+            animation.ChangeState(direction.x >= 0 ? "rightCollision" : "leftCollision");
+        pauseTimer.ScheduleTask(() => isPaused = false);
     }
 
-    void ThrowChainsaw()
+    private bool HasPowerUp()
     {
+        return transform.GetChild(1).gameObject.activeSelf ||
+               transform.GetChild(2).gameObject.activeSelf ||
+               transform.GetChild(3).gameObject.activeSelf;
     }
 }

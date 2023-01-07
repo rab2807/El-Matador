@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private float speed = 10f;
+    private float speed = 8f;
     private string isCarrying = "none"; // the player carrying any pickup or not
 
     private float pickupTime = 0.5f; // just after picking up an object, player have to wait some time to place it down
@@ -16,18 +13,14 @@ public class Player : MonoBehaviour
     private Timer pushTimer;
     private float pushDuration = 0.5f;
 
+    private PlayerAnimation animation;
+
     public bool IsPushed
     {
         get => isPushed;
         set => isPushed = value;
     }
-
-    public string IsCarrying
-    {
-        get => isCarrying;
-        set => isCarrying = value;
-    }
-
+    
     public bool PickupFlag => pickupFlag;
 
     void Start()
@@ -40,6 +33,8 @@ public class Player : MonoBehaviour
 
         pushTimer = gameObject.AddComponent<Timer>();
         pushTimer.TargetTime = pushDuration;
+
+        animation = GetComponent<PlayerAnimation>();
     }
 
     private bool frameFlag; // prevents multiple inputs taken in a single frame
@@ -56,18 +51,48 @@ public class Player : MonoBehaviour
         {
             frameFlag = true;
             if (input1 != 0)
-            {
                 position.x += input1 * speed * Time.deltaTime;
-            }
-
             if (input2 != 0)
-            {
                 position.y += input2 * speed * Time.deltaTime;
+
+            if (isCarrying == "none")
+            {
+                if (input1 > 0)
+                    animation.ChangeState("right");
+                else if (input1 < 0)
+                    animation.ChangeState("left");
+                else if (input2 > 0)
+                    animation.ChangeState("rear");
+                else if (input2 < 0)
+                    animation.ChangeState("front");
+            }
+            else if (isCarrying == "pillar")
+            {
+                if (input1 > 0)
+                    animation.ChangeState("rightPillar");
+                else if (input1 < 0)
+                    animation.ChangeState("leftPillar");
+                else if (input2 > 0)
+                    animation.ChangeState("rearPillar");
+                else if (input2 < 0)
+                    animation.ChangeState("frontPillar");
+            }
+            else if (isCarrying == "mirror")
+            {
+                if (input1 > 0)
+                    animation.ChangeState("rightBouncer");
+                else if (input1 < 0)
+                    animation.ChangeState("leftBouncer");
+                else if (input2 > 0)
+                    animation.ChangeState("rearBouncer");
+                else if (input2 < 0)
+                    animation.ChangeState("frontBouncer");
             }
 
             if (input3 > 0 && isCarrying != "none" && pickupFlag)
             {
                 print("placed it here!");
+                AudioManager.Play("crush");
 
                 GameObject obj = null;
                 if (isCarrying == "pillar")
@@ -76,7 +101,7 @@ public class Player : MonoBehaviour
                     obj = GameManager.GetMirror();
                 obj.transform.position = transform.position;
 
-                toggleIsCarrying("none");
+                ToggleIsCarrying("none");
             }
         }
         else frameFlag = false;
@@ -84,36 +109,19 @@ public class Player : MonoBehaviour
         transform.position = position;
     }
 
-    private void OnCollisionEnter2D(Collision2D col)
-    {
-        if (isPushed)
-        {
-            if (col.gameObject.GetComponent<Pillar>() != null || col.gameObject.GetComponent<Villain>() != null)
-            {
-                GetComponent<Rigidbody2D>().velocity *= 0.1f;
-
-                // decrease life for pillar only
-            }
-        }
-    }
-
-    // 
-    public void toggleIsCarrying(string objectName)
+    public void ToggleIsCarrying(string objectName)
     {
         isCarrying = objectName;
         pickupFlag = !pickupFlag;
         pickupTimer.ScheduleTask(() => { pickupFlag = !pickupFlag; });
     }
 
-    public void pushPlayer()
+    public void PushPlayer()
     {
         if (!isPushed)
         {
             isPushed = true;
-            pushTimer.ScheduleTask(() =>
-            {
-                isPushed = false;
-            });
+            pushTimer.ScheduleTask(() => { isPushed = false; });
         }
     }
 }

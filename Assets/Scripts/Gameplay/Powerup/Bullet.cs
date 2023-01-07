@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Manager;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -20,7 +21,6 @@ public class Bullet : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         GetComponent<CircleCollider2D>().radius =
             GetComponent<SpriteRenderer>().bounds.size.x / 2; // set collider radius from sprite size
-
     }
 
     public void Launch()
@@ -34,14 +34,18 @@ public class Bullet : MonoBehaviour
         {
             if (col.gameObject.GetComponent<Player>() != null)
             {
-                // decrease life
-            }
-            else if (col.gameObject.GetComponent<Mirror>() != null)
-            {
-                // decrease life
+                AudioManager.Play("ouch");
+
+                col.gameObject.GetComponent<Rigidbody2D>().velocity *= 0.1f;
+                ScoreManager.DecreaseLifePlayer("bullet");
             }
 
             GameManager.ReturnBullet(gameObject);
         }
+    }
+
+    private void Update()
+    {
+        gameObject.transform.Rotate(Vector3.back, 1);
     }
 }

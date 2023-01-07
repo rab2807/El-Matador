@@ -1,20 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Manager;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Bomb : MonoBehaviour
 {
-    private float explodeRadius = 3;
+    private float explodeRadius;
     private GameObject villain;
     private GameObject target;
 
-    public float speed = 10f;
+    public float speed = 13f;
     public float launchHeight = 2;
 
     private Vector3 movePosition;
     private Vector3 targetPosition;
+    private Vector3 sourcePosition;
 
     private float playerX;
     private float targetX;
@@ -23,20 +24,30 @@ public class Bomb : MonoBehaviour
     private float baseY;
     private float height;
 
-    public void Initiate(GameObject villain, GameObject target)
+    private GameObject tracker;
+
+    public void Initiate(Vector3 target)
     {
-        this.villain = villain;
-        targetPosition = target.transform.position;
-        transform.position = villain.transform.position;
+        tracker = GameObject.FindGameObjectWithTag("tracker");
+        explodeRadius = tracker.GetComponent<SpriteRenderer>().bounds.size.x / 1.5f;
+
+        targetPosition = target;
+
+        float x1 = target.x - ScreenData.Left;
+        float x2 = ScreenData.Right - target.x;
+
+        playerX = x1 > x2 ? ScreenData.Left - 0.5f : ScreenData.Right + 0.5f;
+        transform.position = new Vector2(playerX, ScreenData.Bottom + (ScreenData.Top - ScreenData.Bottom) / 2.0f);
+        sourcePosition = transform.position;
     }
 
     void Update()
     {
-        playerX = villain.transform.position.x;
+        // playerX = villain.transform.position.x;
         targetX = targetPosition.x;
         dist = targetX - playerX;
         nextX = Mathf.MoveTowards(transform.position.x, targetX, speed * Time.deltaTime);
-        baseY = Mathf.Lerp(villain.transform.position.y, targetPosition.y, (nextX - playerX) / dist);
+        baseY = Mathf.Lerp(sourcePosition.y, targetPosition.y, (nextX - playerX) / dist);
         height = launchHeight * (nextX - playerX) * (nextX - targetX) / (-0.25f * dist * dist);
 
         movePosition = new Vector3(nextX, baseY + height, transform.position.z);
@@ -47,6 +58,7 @@ public class Bomb : MonoBehaviour
         if (Vector3.Distance(movePosition, targetPosition) < 0.1)
         {
             Explode();
+            tracker.SetActive(false);
             GameManager.ReturnBomb(gameObject);
         }
     }
@@ -58,17 +70,25 @@ public class Bomb : MonoBehaviour
 
     void Explode()
     {
-        // damage player and villain
+        AudioManager.Play("explode");
+
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explodeRadius);
         foreach (var col in colliders)
         {
             if (col.GetComponent<Player>())
             {
-                // decrease life
+                print("Player damaged by bomb");
+                AudioManager.Play("ouch");
+                ScoreManager.DecreaseLifePlayer("bomb");
             }
             else if (col.GetComponent<Villain>())
             {
-                // decrease life
+                Villain villain = col.GetComponent<Villain>();
+                print("Bull damaged by bomb");
+                AudioManager.Play("dizzy");
+
+                villain.PauseVillain(true);
+                ScoreManager.DecreaseLifeVillain("bomb");
             }
             else if (col.GetComponent<Mirror>())
             {

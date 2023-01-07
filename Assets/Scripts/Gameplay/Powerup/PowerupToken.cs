@@ -31,8 +31,11 @@ public class PowerupToken : MonoBehaviour
         transform.position = position;
         angle += (Time.deltaTime * 10) % 360.0f;
 
-        if (x < 0.01)
+        if (x < 0.1)
+        {
+            s.color = new Color(c.r, c.g, c.b, 1);
             GameManager.ReturnPowerUp(gameObject);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D col)

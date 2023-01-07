@@ -10,6 +10,9 @@ TagManager:
   - bomb
   - chainsaw
   - villain
+  - player-healthbar
+  - villain-healthbar
+  - tracker
   layers:
   - Default
   - TransparentFX

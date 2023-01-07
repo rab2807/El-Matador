@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2653663892015361922}
   - component: {fileID: 7961256540762120174}
   m_Layer: 0
-  m_Name: Chainsaw
+  m_Name: chainsaw
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -104,7 +104,7 @@ CircleCollider2D:
   m_GameObject: {fileID: 2653663892015361925}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: a6a03d09825fe124d9dfa06a9890e83e, type: 2}
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
