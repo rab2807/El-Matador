@@ -11,10 +11,11 @@ namespace Manager
         public static float timer = 0;
 
         private static int playerMaxHealth = 100;
-        private static int villainMaxHealth = 100;
+        private static int villainMaxHealth = 500;
         private static int villainIncreasedHealh = 80;
         private static int playerHealth = 100;
-        private static int villainHealth = 100;
+        
+        private static int villainHealth = 500;
         private static int playerDeathCount = 0;
 
         private static int pillarDamage = 20;
