@@ -12,6 +12,7 @@ namespace Manager
 
         private static int playerMaxHealth = 100;
         private static int villainMaxHealth = 500;
+        private static int villainIncreasedHealh = 80;
         private static int playerHealth = 100;
         private static int villainHealth = 500;
         private static int playerDeathCount = 0;
@@ -80,6 +81,10 @@ namespace Manager
             // deathText.text = "" + playerDeathCount++;
             playerHealth = playerMaxHealth;
             playerHealthBar.SetHealth(playerHealth);
+
+            villainHealth += villainIncreasedHealh;
+            villainHealth = villainHealth > 500 ? 500 : villainHealth;
+            villainHealthBar.SetHealth(villainHealth);
         }
 
         public static string GetTime()
