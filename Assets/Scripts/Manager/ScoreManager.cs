@@ -8,13 +8,13 @@ namespace Manager
     {
         [SerializeField] private Text timerText;
         [SerializeField] private Text deathText;
-        private static float timer = 0;
+        public static float timer = 0;
 
         private static int playerMaxHealth = 100;
-        private static int villainMaxHealth = 500;
+        private static int villainMaxHealth = 100;
         private static int villainIncreasedHealh = 80;
         private static int playerHealth = 100;
-        private static int villainHealth = 500;
+        private static int villainHealth = 100;
         private static int playerDeathCount = 0;
 
         private static int pillarDamage = 20;
@@ -27,8 +27,29 @@ namespace Manager
         private static HealthBar playerHealthBar;
         private static HealthBar villainHealthBar;
 
-        public static int VillainHealth => villainHealth;
-        public static int VillainMaxHealth => villainMaxHealth;
+        public static int VillainMaxHealth
+        {
+            get => villainMaxHealth;
+            set => villainMaxHealth = value;
+        }
+
+        public static int VillainHealth
+        {
+            get => villainHealth;
+            set => villainHealth = value;
+        }
+
+        public static int PlayerHealth
+        {
+            get => playerHealth;
+            set => playerHealth = value;
+        }
+
+        public static int PlayerMaxHealth
+        {
+            get => playerMaxHealth;
+            set => playerMaxHealth = value;
+        }
 
         public static int PlayerDeathCount => playerDeathCount;
 
@@ -57,7 +78,10 @@ namespace Manager
             playerHealthBar.SetHealth(playerHealth);
 
             if (playerHealth <= 0)
+            {
+                playerDeathCount++;
                 MenuManager.GoTo("gameover");
+            }
         }
 
         public static void DecreaseLifeVillain(string name)
@@ -72,8 +96,10 @@ namespace Manager
                 villainHealth -= chainsawDamage;
             villainHealthBar.SetHealth(villainHealth);
 
-            if (villainHealth < 0)
+            if (villainHealth <= 0)
+            {
                 MenuManager.GoTo("gameover");
+            }
         }
 
         public static void ReplenishPlayer()

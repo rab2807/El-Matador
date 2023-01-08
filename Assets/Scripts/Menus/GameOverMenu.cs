@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Manager;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class GameOverMenu : MonoBehaviour
@@ -35,12 +36,20 @@ public class GameOverMenu : MonoBehaviour
         if (ScoreManager.VillainHealth > 0)
             ScoreManager.ReplenishPlayer();
         else
+        {
+            ScoreManager.PlayerHealth = ScoreManager.PlayerMaxHealth;
+            ScoreManager.VillainHealth = ScoreManager.VillainMaxHealth;
+            ScoreManager.timer = 0;
             MenuManager.GoTo("gameplay");
+        }
     }
 
     public void Exit()
     {
         Time.timeScale = 1;
+        ScoreManager.PlayerHealth = ScoreManager.PlayerMaxHealth;
+        ScoreManager.VillainHealth = ScoreManager.VillainMaxHealth;
+        ScoreManager.timer = 0;
         Destroy(gameObject);
         MenuManager.GoTo("main");
     }
